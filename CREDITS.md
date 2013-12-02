@@ -1,31 +1,24 @@
+# CREDITS
+
+For the assets in this repo and slides:
+
+Castle Face
+http://www.flickr.com/photos/slambo_42
+
+Rice Cooker Face
+http://www.flickr.com/photos/36495803@N05
+
+House Face
+http://www.flickr.com/photos/35421063@N00
+
 Panda Garden Fail
 http://www.flickr.com/photos/therealedwin/
 
-Royal Fail
-http://www.flickr.com/photos/dadavidov/
-
-Grilled Cheese Fail
-http://www.flickr.com/photos/jozjozjoz/
-
-Live Lobsters Fail
-http://www.flickr.com/photos/kjarrett/
-
 Parking Lot Fail
 http://www.flickr.com/photos/kjarrett/
-
-Peameal Fail
-http://www.flickr.com/photos/49889874@N05/
 
 Lane Configuration Fail
 http://www.flickr.com/photos/mikz/
 
 Leaky Pipe
 http://www.flickr.com/photos/thirteenofclubs/
-
-Fittings
-http://www.flickr.com/photos/wdherron/
-
-Plumb Cross
-http://www.flickr.com/photos/elsie/
-
-
