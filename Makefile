@@ -17,9 +17,9 @@ setup:
 env:
 	@export TEXINPUTS=$(TEX_DIR):$(HOME)/texmf
 
-compile: abstract slides
+compile: slides
 
-run: compile view_abstract view_slides
+run: compile view_slides
 
 abstract: env
 	@xelatex -shell-escape -output-directory $(OUT_DIR) $(SRC_DIR)/abstract.tex

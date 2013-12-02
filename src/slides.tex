@@ -52,54 +52,75 @@ xrightmargin=0.5em
 %--------------------------------------------------------------------------
 % Titlepage
 %--------------------------------------------------------------------------
-
-\maketitle
-
-%--------------------------------------------------------------------------
-% Table of contents & whoami
-%--------------------------------------------------------------------------
-%\section*{Outline}
-%\begin{frame}{Outline}
-%  \tableofcontents[hideallsubsections]
-%\end{frame}
-
-\begin{frame}{whoami}
+\begin{frame}{Functional Algebra By Example}
   \begin{figure}
-    \centering
-    \includegraphics[width=0.55\textwidth]{assets/trust_me_panda.jpg}
+    \includegraphics[height=0.6\textheight]{assets/castleface.jpg}
+    \caption{\tiny{Credit http://www.flickr.com/photos/slambo\_42}}
   \end{figure}
-  \note<1>{An app + middleware dev who has felt Ops pain too}
+  \begin{center}
+  Susan Potter \small{@SusanPotter} \\
+  \tt{CodeMesh} \small{December 2013} \\
+  \small{https://github.com/mbbx6spp/funalgebra}
+  \end{center}
 \end{frame}
 
 %--------------------------------------------------------------------------
 % Content
 %--------------------------------------------------------------------------
-\section{Background}
 
-\begin{frame}{Model/Assumptions}
+\section{Faces Everywhere}
+
+\begin{frame}{Obvious Face}
   \begin{figure}
-    \includegraphics[width=0.8\textwidth]{assets/model.jpg}
+    \includegraphics[width=0.9\textwidth]{assets/obviousface.jpg}
   \end{figure}
 \end{frame}
 
-\begin{frame}{Motivating Uses}
+\begin{frame}{Less Obvious Face}
   \begin{figure}
-    \includegraphics[width=0.8\textwidth]{assets/motivating_uses.jpg}
+    \includegraphics[width=0.9\textwidth]{assets/lessobviousface.jpg}
   \end{figure}
 \end{frame}
 
-\begin{frame}{Common Approaches}
+\begin{frame}{Manufactured Face}
   \begin{figure}
-    \includegraphics[width=0.8\textwidth]{assets/common_approaches.jpg}
+    \includegraphics[width=0.8\textwidth]{assets/manufacturedface.jpg}
   \end{figure}
 \end{frame}
 
-\begin{frame}{Why Distribute? Why Decentralize?}
+\begin{frame}{Squint Face}
+  \begin{figure}
+    \includegraphics[width=0.5\textwidth]{assets/squintface.jpg}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Maybe Face}
+  \begin{figure}
+    \includegraphics[width=0.8\textwidth]{assets/maybeface.jpg}
+  \end{figure}
+\end{frame}
+
+\section{Patterns vs Abstractions}
+
+\begin{frame}{OO Patterns vs FP Abstractions}
   \begin{itemize}
-    \item \Large{Probability of system failure}
-    \item \Large{Large datasets (data locality)}
-    \item \Large{Eliminate SPOFs}
-    \item \Large{Commodity hardware}
+    \item \Large{More (Subjective -> Objective)} \newline
+    \item \Large{More (Ambiguous -> Precise)} \newline
+    \item \Large{"Fluffy" Interfaces -> Generic Functions}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Laying Bricks}
+  \begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{assets/layingbricks.jpg}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Warning}
+  \begin{itemize}
+    \item \Large{Abstract Algebra -> (Continuous, Infinite)} \newline
+    \item \Large{Real World -> usually (Discrete, Finite)}
   \end{itemize}
 \end{frame}
 
@@ -110,32 +131,7 @@ xrightmargin=0.5em
   \end{figure}
 \end{frame}
 
-\section{Concepts \& Intuitions}
-
-\begin{frame}{Layers}
-  \begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{assets/layers.jpg}
-  \end{figure}
-\end{frame}
-
-\begin{frame}{Terminology (core)}
-\begin{itemize}
-  \item Partition
-  \item Vnode
-  \item Hinted Handoff
-  \item Read Repair
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Terminology (pipe)}
-\begin{itemize}
-  \item Pipe
-  \item Fitting ("phase")
-  \item Queue
-  \item Worker
-\end{itemize}
-\end{frame}
+\section{Code}
 
 \begin{frame}[containsverbatim]{Example UNIX Pipe}
 \begin{lstlisting}[language=bash]
@@ -153,93 +149,80 @@ find . -name "*.rb" \
   \small{Value based, through functions}
 \end{frame}
 
-\begin{frame}[containsverbatim]{Example Riak Pipe}
-\begin{lstlisting}[language=erlang]
-[ #fitting_spec{ name=fetch_trades
-               , module=riskmgr_fetch_trades
-               , ...}
-, #fitting_spec{ name=calc_var
-               , module=riskmgr_calc_var
-               , ...}
-]
+\begin{frame}[containsverbatim]{Valuing Values In Real World}
+\begin{lstlisting}[language=java]
+sealed trait PossiblyMaybe[+A]
+final case class Somefink[A](a: A) extends PossiblyMaybe[A]
+final case object Nowt extends PossiblyMaybe[Nothing]
+
+object PossiblyMaybeOps {
+  def noneDefault[A](pm: PossiblyMaybe[A])(a: A): A = pm match {
+    case Somefink(x) => x
+    case _ => a
+  }
+}
 \end{lstlisting}
-  \small{Message-based, across nodes}
+  \small{Note \tt{\_} in second match, caters for \tt{null}s}
 \end{frame}
 
-\begin{frame}{vnode and workers}
+\section{\tt{sbt console}}
+
+\begin{frame}[containsverbatim]{Functor}
+\begin{lstlisting}[language=haskell]
+class Functor f where
+    fmap ∷ (a → b) → f a → f b
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Contravariant Functor}
+\begin{lstlisting}[language=haskell]
+class Contravariant f where
+    contramap ∷ (b → a) → f a → f b
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Applicative (Functor)}
+\begin{lstlisting}[language=haskell]
+class (Functor f) => Applicative f where
+    pure  :: a -> f a
+    (<*>) :: f (a -> b) -> f a -> f b
+\end{lstlisting}
+
+\begin{lstlisting}[language=haskell]
+-- e.g. using it with Maybe
+import Control.Applicative
+let incr = (+1)
+let mi = Just incr <*> Just 6
+-- expect mi to evaluate to Just 7
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Bi Functor}
+\begin{lstlisting}[language=haskell]
+class Bifunctor f where
+    bimap ∷ (a → c) → (b → d) → f a b → f c d
+\end{lstlisting}
+\small{Using over higher kinded types like \tt{Either a b}}
+\begin{lstlisting}[language=haskell]
+Prelude Data.Bifunctor> :k Either
+Either :: * -> * -> *
+Prelude Data.Bifunctor> bimap handleFailure handleSuccess eith
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Pro Functor}
+\begin{lstlisting}[language=haskell]
+class Profunctor f where
+    dimap ∷ (c → a) → (b → d) → f a b → f c d
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Same Type, Many Interfaces}
+  A type defined as a Monad (think: \tt{(>>=)}) can also be used as:
   \begin{itemize}
-    \item \Large{vnode} \newline \small{manages lifecycle and queues of workers} \newline
-    \item \Large{vnode worker} \newline \small{processes inputs}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[containsverbatim]{vnode worker behavior}
-\begin{lstlisting}
-behaviour_info(callbacks) ->
-    [{init,2},
-     {process,3},
-     {done,1}];
-behaviour_info(_Other) ->
-    undefined.
-%% Optionally two more too, not required.
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}{Distribution: \tt{chashfun}}
-\begin{itemize}
-  \item Use random uniform hash fun to saturate workers
-  \item See Bryan Fink's previous Pipe presentations
-\end{itemize}
-\end{frame}
-
-\begin{frame}[containsverbatim]{Validation}
-\begin{lstlisting}
-% #fitting_spec { module = ..., arg = 43, ... }
-% validate_arg/1
-validate_arg(Arg) when is_integer(Arg) -> ok;
-validate_arg(Arg) when is_atom(Arg) -> ok;
-validate_arg(_) -> {error, "Argument must be a valid integer or atom"}.
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}{Leaky Pipes}
-  \begin{figure}
-    \centering
-    \includegraphics[width=0.55\textwidth]{assets/leaky_pipe.jpg}
-  \end{figure}
-  \small{http://www.flickr.com/photos/thirteenofclubs/}
-\end{frame}
-
-\begin{frame}[containsverbatim]{Riak (Core) Mechanics}
-\begin{itemize}
-  \item \Large{Handoff} \newline \small{Migrate vnodes from node to node}
-\end{itemize}
-\begin{lstlisting}
-% Old Node
-% Called with last known State of worker
-archive/1 % returns {ok, Archive}
-
-% New Node
-% Called with Archive and State from old node
-handoff/2 % returns {ok, NewState}
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}{Failures}
-  \begin{itemize}
-    \item{\Large{validate\_arg} \newline \small{Seen above}}
-    \item{\Large{Pipe client process dies} \newline \small{YOLO}}
-    \item{\Large{nval} \newline \small{How many vnodes to ask before failing, default 1}}
-    \item{\Large{vnode worker logic} \newline \small{Think using dataflow semantics}}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Existing Fittings}
-  \begin{itemize}
-    \item{\Large{\tt{riak\_pipe\_w\_tee}} \newline \small{Useful for intermediate results}} \newline
-    \item{\Large{\tt{riak\_pipe\_w\_xform}} \newline \small{Simple delegater: 3-arity function}} \newline
-    \item{\Large{\tt{riak\_pipe\_w\_reduce}} \newline \small{What you would expect: simple accumulating reduce}} \newline
-    \item{\Large{\tt{riak\_kv\_pipe\_get}} \newline \small{Take advantage of data locality with cohosted KV store}}
+    \item \Large{A Functor (think: \tt{fmap})} \newline
+    \item \Large{An Applicative (think: \tt{<*>, pure})} \newline
+    \item \Large{And possibly others} \small{though not necessarily}
   \end{itemize}
 \end{frame}
 
@@ -247,38 +230,21 @@ handoff/2 % returns {ok, NewState}
 
 \begin{frame}{Known Uses}
 \begin{itemize}
-  \item \Large{Riak's Map/Reduce}
-  \item \Large{Risk metrics}
-  \item \Large{Tenant Usage}
+  \item \Large{Monoids:} \small{Accumulators are everywhere, almost} \newline
+  \item \Large{Functors:} \small{Lots of uses with common and user defined types} \newline
+  \item \Large{Monads:} \small{Effects, "Linear Happy Path", and more} \newline
+  \item \Large{Applicatives:} \small{"validations", and more} \newline
+  \item \Large{More \ldots} \small{e.g. Arrows, Zippers, Lenses, etc.}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Troubleshooting}
-  \begin{itemize}
-    \item{\Large{\tt{riak\_pipe:status/1}} \newline \small{Provides fittings, processed, failures, queue\_length, etc stats}}
-    \item{\Large{\tt{riak\_pipe\_w\_crash} fitting} \newline \small{Used to test Riak Pipe}}
-    \item{\Large{\tt{riak\_pipe:active\_pipelines/1}} \newline \small{See all active pipelines}}
-    \item{\Large{\tt{riak\_pipe\_cinfo module}} \newline \small{cluster info interrogation module}}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Further Work}
-  \begin{itemize}
-    \item More applications (e.g. genetics, 3rd party APIs with rate limits)
-    \item Decentralized pipe control
-    \item Measure "completeness" of resultset
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Related Work}
-  \begin{itemize}
-    \item "Pipe" libraries EVERYWHERE (pipe, scalaz-stream)
-    \item riak\_pg
-    \item Map-Reduce frameworks
-    \item Staged Event Driven Architecture
-    \item Event Stream Processing
-    \item Dataflow multi-stage processing
-  \end{itemize}
+\begin{frame}{Thinking Algebraically}
+\begin{itemize}
+  \item \Large{Properties:} \small{property based testing: quickcheck, scalacheck} \newline
+  \item \Large{Data Types:} \small{start closed, extend using "type classes", dependent types, etc when relevant} \newline
+  \item \large{Abstractions:} \small{build small building blocks, use motar to build solid walls} \newline
+  \item \large{Dist Systems:} \small{using algebraic abstractions, properties to build more useful distributed systems} \newline
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Royal Fail}
@@ -286,7 +252,7 @@ handoff/2 % returns {ok, NewState}
     \centering
     \includegraphics[width=0.5\textwidth]{assets/royal_fail.jpg}
   \end{figure}
-  \small{http://www.flickr.com/photos/dadavidov/}
+  \tiny{http://www.flickr.com/photos/dadavidov/}
 \end{frame}
 
 \begin{frame}{Questions}

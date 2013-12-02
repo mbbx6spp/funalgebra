@@ -74,11 +74,17 @@ object PlayArea extends App {
   def allClusters = ClusterA :: ClusterB :: ClusterC :: Nil
   def allIndexer = allClusters.map( SearchIndexer.apply(_) )
 
-  def isRole(r: Role): Pred[Server] = s => s.roles.contains(r)
-  def allWebApps(l: Seq[Server]): Seq[Server] = l.filter( isRole(WebApp) )
-  def allRefServices(l: Seq[Server]): Seq[Server] = l.filter( isRole(RefService) )
+  def isRole(r: Role): Pred[Server] =
+    s => s.roles.contains(r)
+
+  def allWebApps(l: Seq[Server]): Seq[Server] =
+    l.filter( isRole(WebApp) )
+
+  def allRefServices(l: Seq[Server]): Seq[Server] =
+    l.filter( isRole(RefService) )
+
   def allIndexers(l: Seq[Server]): Seq[Server] =
-    l.filter( s => Accumulator.concat[Server](allIndexer.map(isRole))(s) )(OrPredServerAccumulator)
+    l.filter(Accumulator.concat[Pred[Server]](allIndexer.map(isRole))(OrPredServerAccumulator))
 
   println("WebApp")
   println(allWebApps(stagingServers))

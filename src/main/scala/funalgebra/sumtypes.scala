@@ -1,26 +1,41 @@
 package funalgebra.sumtypes
 
-// Same as Haskell sum type example
+// Imperative code you might write in Scala
+// Hold your nose, it's foul and disgusting
+class BadMysqlConnection(var host: String,
+                            port: Int,
+                            name: String) {
+  if (host == null) {
+    host = "localhost"
+  }
 
+  if (name == null) {
+    throw new RuntimeException("name was null")
+  }
+
+}
+
+
+
+/** BUT WAIT, LET'S DO A DO-OVER **/
+
+// Same as Haskell sum type example
 sealed trait PossiblyMaybe[+A]
 final case class Somefink[A](a: A) extends PossiblyMaybe[A]
 final case object Nowt extends PossiblyMaybe[Nothing]
 
-// ecommerce example
+object PossiblyMaybeOps {
+  def noneDefault[A](pm: PossiblyMaybe[A])(a: A): A = pm match {
+    case Somefink(x) => x
+    case _ => a
+  }
+}
 
-sealed trait OrderEvent
-case class CancelOrder(cartId: Long) extends OrderEvent
-case class CompleteOrder(id: Long) extends OrderEvent
-case class RefundOrder(id: Long) extends OrderEvent
+// Now how could we make this better?
+class BetterMysqlConnection(maybeHost: PossiblyMaybe[String],
+                            port: Int = 3306,
+                            maybeName: PossiblyMaybe[String]) {
+  import PossiblyMaybeOps._
 
-// RSVP site example
-
-sealed abstract class UserRSVPState(userId: Long, eventId: Long)
-case class RSVPUnanswered(userId: Long, eventId: Long)
-  extends EventRSVPState(userId, eventId)
-case class RSVPNo(userId: Long, eventId: Long, message: Option[String])
-  extends EventRSVPState(userId, eventId)
-case class RSVPYes(userId: Long, eventId: Long, guests: Int, message: Option[String])
-  extends EventRSVPState(userId, eventId)
-
-
+  def host: String = noneDefault(maybeHost)("localhost")
+}

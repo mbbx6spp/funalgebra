@@ -2,6 +2,9 @@
 
 For the assets in this repo and slides:
 
+Laying Bricks
+http://www.flickr.com/photos/elmiracollege
+
 Castle Face
 http://www.flickr.com/photos/slambo_42
 
