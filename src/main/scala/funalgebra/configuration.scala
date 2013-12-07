@@ -1,52 +1,59 @@
 package funalgebra.configuration
 
 import scalaz._, Scalaz._
-
-// Represents all the database configuration
-// attributes related to setting up DB connections
-// in this application.
-//
-// Think of this as creating a more type safe way
-// of extracting configuration. For some reason
-// when used strings to lookup config attributes
-// in a Map I did this: +config.get("prot") and
-// spend 20 minutes wondering why it NPEs on looking
-// up the PORT.
-sealed trait DbConfigAttr
-final case object DbHost extends DbConfigAttr
-final case object DbPort extends DbConfigAttr
-final case object DbDriver extends DbConfigAttr
-final case object DbProtocol extends DbConfigAttr
-final case object DbName extends DbConfigAttr
-
-final case class DbConnection(
-  host:     String,
-  port:     String,
-  driver:   String,
-  protocol: String,
-  name:     String) {
-
-  def toJdbcUrl: String =
-    protocol + "://" + host + ":" + port + "/" + name
-}
+import scalaz.syntax.std._
 
 object DbConfig {
-  type DbConfigMap = Map[DbConfigAttr, String]
-  type ReaderTOption[A, B] = ReaderT[Option, A, B]
-  object ReaderTOption extends KleisliFunctions with KleisliInstances {
-    def apply[A, B](f: A => Option[B]): ReaderTOption[A, B] = kleisli(f)
+  import funalgebra.types.Configuration._
+
+  // DbConnection is publically visible
+  trait DbConnection {
+    def toJdbcUrl: String
   }
-  type DbReaderTOption = ReaderTOption[DbConfigMap, String]
+
+  // DbConnectionImpl is private to this object and only accessible
+  // when functions in this object namespace have created it "sanitized"
+  private final case class DbConnectionImpl(
+    host:     String,
+    port:     String,
+    driver:   String,
+    protocol: String,
+    name:     String) extends DbConnection {
+
+    def toJdbcUrl: String =
+      protocol + "://" + host + ":" + port + "/" + name
+  }
 
   def lookup(key: DbConfigAttr) =
     ReaderTOption[DbConfigMap, String] { _.get(key) }
 
-  def dbConnection =
+  def dbConnection: Kleisli[Option, DbConfigMap, DbConnection] =
     for {
       h <- lookup(DbHost)
       p <- lookup(DbPort)
       d <- lookup(DbDriver)
       q <- lookup(DbProtocol)
       n <- lookup(DbName)
-    } yield DbConnection(h, p, d, q, n)
+    } yield DbConnectionImpl(h, p, d, q, n)
+
+  // Example Usage below
+
+  val goodConfig: DbConfigMap = Map(
+    DbHost -> "mydbhost",
+    DbPort -> "3306",
+    DbProtocol -> "mysql",
+    DbDriver -> "my.awesome.MysqlDriver",
+    DbName -> "contactsdb"
+  )
+
+  val badConfig: DbConfigMap = Map(
+    DbHost -> "mydbhost",
+    DbPort -> "3306",
+    DbName -> "contactsdb"
+  )
+
+
+  // In Scala console try:
+  // dbConnection(goodConfig)
+  // dbConnection(badConfig)
 }
