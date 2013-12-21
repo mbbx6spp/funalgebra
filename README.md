@@ -67,7 +67,7 @@ let a1 = Just 43 -- Maybe Integer: result of a fully applied function
 
 let a2 = Nothing :: Maybe Integer
 
-let f1 = show . (2*)
+let f1 = (2*)
 
 liftM f1 a1
 liftM f1 a2
@@ -95,11 +95,55 @@ deficiencies.
 
 Let's review the type of the `liftM` function:
 
-```haskell
+```ghci
 
--- TODO: sorry out of time tonight
+Prelude> import Control.Monad
+Prelude Control.Monad> :t liftM
+liftM :: Monad m => (a1 -> r) -> m a1 -> m r
 
 ```
+
+We can see that given `m` has an instance of a `Monad` defined for it, when
+`liftM` is given a function from type `a1` to `r` and we give it a type of
+`m a1`, `liftM` can give us the value of type `m r` which applies the first
+argument to the *contained* value of `m a1` to yield the *wrapped* or
+*contained* `m r` value.
+
+In the example above type `a1` and `r` happen to be the same, but we could
+have done something like the following:
+
+```haskell
+
+module FunAlgebra.Tutorial where
+
+import Control.Monad (liftM)
+
+data Currency = USD | EUR | GBP | CHF deriving (Show)
+
+data Money = Money
+  { moneyCurrency :: Currency
+  , moneyAmount :: Integer } deriving (Show)
+
+main :: IO ()
+main = do
+  let a1 = Just 43
+  let a2 = Nothing :: Maybe Integer
+  let rate = 1.31
+  -- Let's just assume we know the currency is EUR because of the data feed
+  -- we might be parsing at this time.
+  let f1 = (Money EUR . (rate*) . fromInteger)
+  putStrLn $ show $ liftM f1 a1
+  putStrLn $ show $ liftM f1 a2
+
+```
+
+You can see that this might show the bones of a more useful example though
+still very 101 textbook-y.
+
+## WIP: Coming Soon
+
+
+
 
 ## Further Examples
 
@@ -107,7 +151,7 @@ While I flesh out the guided text here are direct links to example code
 demonstrating the utility of various ideas, structures, and types commonly
 used in functional programming:
 
-* Start out with describing your domain with closed algebraic data types: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/haskell/AlgTypes.hs
+* Start out with describing your domain with closed algebraic data types: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/haskell/FunAlgebra/AlgTypes.hs
 * Explore extending types with one manfiestation of the typeclass pattern in Scala: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/ordering.scala
 * Stack monads together to defer evaluation/extraction of context until it is known: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/configuration.scala
 * Abstracting over data and computation in the Erlang `either` module: https://github.com/mbbx6spp/chicagoerlang2013/blob/master/source/either.erl
