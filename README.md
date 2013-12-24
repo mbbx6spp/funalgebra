@@ -85,13 +85,23 @@ problem domain we are trying to solve rather than doing gymnastics to
 workaround the inflexible class hierarchies or large surface area object
 interfaces.
 
-Promoting functions to first class citizens means we can thinking about
+Promoting functions to first class citizens means we can think about
 computational abstraction not just data abstraction. How is this? In a
 more functional programming language we are *able* to abstract over
 computation as we can apply functions passed in as arguments naturally
-and construct functions as results when needed without extra fuss. Again
-keeping us closer to the problem domain rather than working around language
-deficiencies.
+and construct functions as results when needed without extra fuss to
+overcome the shortcomings of the language. Again keeping us closer to
+the problem domain rather than working around language deficiencies.
+
+Note: Java 8 may be offering lambdas as a new language feature, but
+(a) it is not even released yet, (b) it still feels "tacked on" -
+which it is, honestly - as opposed to a free flowing language construct
+that feels natural to language natives (I used to be a huge fan of
+Java at some point and spent almost a decade writing primarily Java
+code). Much of the Java standard libraries need to be rewritten using
+this for it to start to feel natural. Considering how long it took to
+get lambdas in there (~15 years since first serious suggestion) I will
+not hold my breath.
 
 Let's review the type of the `liftM` function:
 
@@ -137,13 +147,58 @@ main = do
 
 ```
 
-You can see that this might show the bones of a more useful example though
-still very 101 textbook-y.
+You can see that this might show the bones of a more useful example
+though still very 101 textbook-y. Imagine the rate is retrieved
+from a source that is updated often (or at least often enough for
+our application's purposes). Then imagine that the values `a1` and
+`a2` are retrieved either from a datastore or perhaps user input.
 
-## WIP: Coming Soon
+So you can pat yourself on the back, we **used** values of a type,
+which has a Monad instance defined, i.e. we used a specific kind of
+monad (`Maybe a`) in on specific way (`liftM`).
 
+For those that aren't well acquainted with monads or those that
+are obsessed with understanding how it is the key to the meaning
+of life (I was there once too), here's the dirty little secret:
 
+> The concept of a monad is really quite simple. It builds upon
+> the concepts of functor and applicative, which as you will see
+> later in this tutorial series are also simple. Definitionally
+> each one (monad, applicative, functor) can be expressed in
+> algebraic notation very precisely. Algebra is just our domain
+> specific language, which happens to be perfect for defining
+> abstract ideas very precisely and unambiguously.
 
+The thing to remember here is that functor, applicative, monad
+all have simple generic definitions and some `instance`s of these
+monads will have very simple implementations as well, however,
+some implementations will be more complex or complicated by
+virtue of their purpose. We'll expand on this later in the tutorial
+series.
+
+So next up, we will look at starting out with an "initial algebra"
+(in terms of closed algebraic data types) and building upon it
+using a form of ad-hoc polymorphism to extend how these types
+can be used across *more* generic functions without coupling
+the initial definition of these types to the full array of
+*interfaces* it may possess. We will do this, this time in Scala,
+via one implementation of the typeclass pattern, which uses a
+feature of Scala called `implicits`, which is a powerful construct.
+
+As with all powerful things, much harm may be caused when used
+improperly. Beware of the sharp edges in Scala, there are many,
+but remember it offers a lot of bang for your buck if you don't
+need adult supervision. However, it isn't for everyone! :)
+
+## TODO: Laws & Order ;)
+
+Ok that's a lame section title, but bare with me here...
+
+TODO: Walk through bit by bit the Order typeclass porting from
+Haskell to Scala without dependencies for coins (the old fashioned
+physical coins used in US/UK/Euro countries not crypto-currencies).
+
+* [Here is the fleshed out source](https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/ordering.scala)
 
 ## Further Examples
 
