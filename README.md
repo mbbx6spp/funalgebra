@@ -1,11 +1,11 @@
 # Fun(ctional) Algebra By Example
 
-I gave a talk at CodeMesh that I wanted to elaborate more in code and this is
-the examples codebase that emerged.
+I gave a talk at CodeMesh that I wanted to elaborate more in code and
+this repository contains the examples codebase with some inline
+documentation and commentary.
 
-I plan to document the codebase in a serial story telling way in Markdown
-documents linked to in this README, but I have already started inline
-documenting the code with some explanations.
+The external markdown based documentation in the README.md is still
+a work in progress (WIP), so please bear with me.
 
 ## Prerequisites
 
@@ -34,13 +34,16 @@ functional programming, specifically:
   hopefully you will find it a more productive way to encode errors in your
   software as I have, if you haven't already.
 
-The phrase functional programming encompasses a broad range of *enforcement*
-for the above ideas, so I am going to attempt to be embracing of many common
-approaches to "functional programming".
+The phrase functional programming in industrial usage encompasses a
+broad range of *enforcement* for the above ideas at the language
+level, so I am going to attempt to be embracing of many approaches
+to "functional programming" as defined more loosely in industry
+than is generally defined in academia.
 
-The reader should also not be completely horrified by the idea of thinking in
-more algebraic terms, using properties to gain a better understanding of
-behaviour, inferring types, and their relationships to one another.
+The reader should also not be completely horrified by the idea of
+thinking in more algebraic terms, using properties to gain a better
+understanding of behaviour, inferring types, and their relationships
+to one another.
 
 Optional: I heavily encourage you to install both `haskell-platform` and
 `scala` as most of the examples will be in these languages. I also have a
@@ -55,9 +58,9 @@ Recommended versions:
 
 ## Recap: FP 101
 
-First let's look at some common ideas in functional programming that you
-have probably seen in FP 101-style tutorials. Open GHCi up now and follow
-along:
+First let's look at some common ideas in functional programming that
+you may have seen in FP 101-style tutorials. Open GHCi up now and
+follow along:
 
 ```ghci
 
@@ -80,10 +83,12 @@ the prompt go from '>' to '|'.
 The above example just shows us the ability for us to run functions on
 underlying "wrapped" values effortlessly. Using functional techniques
 we have more focus on the underlying, more "honest" values, than is
-popular in OO style programming. Allowing us to keep more focus on the
-problem domain we are trying to solve rather than doing gymnastics to
-workaround the inflexible class hierarchies or large surface area object
-interfaces.
+*popular* in OO style programming. This allows us to keep more focus
+on the problem domain we are trying to solve rather than doing
+gymnastics to workaround inflexible class hierarchies, large surface
+area object interfaces, throwing (and on the consuming end, catching)
+exceptions, which are popular programming styles in mainstream OO
+langauges.
 
 Promoting functions to first class citizens means we can think about
 computational abstraction not just data abstraction. How is this? In a
@@ -173,8 +178,8 @@ The thing to remember here is that functor, applicative, monad
 all have simple generic definitions and some `instance`s of these
 monads will have very simple implementations as well, however,
 some implementations will be more complex or complicated by
-virtue of their purpose. We'll expand on this later in the tutorial
-series.
+virtue of their purpose. We'll expand on this later in this
+tutorial series.
 
 So next up, we will look at starting out with an "initial algebra"
 (in terms of closed algebraic data types) and building upon it
@@ -183,12 +188,13 @@ can be used across *more* generic functions without coupling
 the initial definition of these types to the full array of
 *interfaces* it may possess. We will do this, this time in Scala,
 via one implementation of the typeclass pattern, which uses a
-feature of Scala called `implicits`, which is a powerful construct.
+feature of Scala called `implicits`, which is a powerful and much
+more general construct.
 
 As with all powerful things, much harm may be caused when used
 improperly. Beware of the sharp edges in Scala, there are many,
 but remember it offers a lot of bang for your buck if you don't
-need adult supervision. However, it isn't for everyone! :)
+always need adult supervision. However, it isn't for everyone! :)
 
 ## TODO: Laws & Order ;)
 
