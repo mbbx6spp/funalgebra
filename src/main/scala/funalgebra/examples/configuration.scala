@@ -16,31 +16,31 @@ trait ConfigurationTypes {
   // in a Map I did this: +config.get("prot")+ and
   // spent 20 minutes wondering why it NPEs on looking
   // up the port.
-  final case object DbHost extends DbConfigAttr
-  final case object DbPort extends DbConfigAttr
-  final case object DbDriver extends DbConfigAttr
-  final case object DbProtocol extends DbConfigAttr
-  final case object DbName extends DbConfigAttr
+  final case object DataSourceHost extends DataSourceAttribute
+  final case object DataSourcePort extends DataSourceAttribute
+  final case object DataSourceDriver extends DataSourceAttribute
+  final case object DataSourceProtocol extends DataSourceAttribute
+  final case object DataSourceName extends DataSourceAttribute
   // TODO uncomment final if/when scalac works as expected.
   // This outer reference cannot be check balogne is getting boring.
-  /*final*/ case class DbAttrOther(name: String) extends DbConfigAttr
-  sealed trait DbConfigAttr
-  object DbConfigAttr {
-    def apply(s: String): DbConfigAttr = s.toLowerCase match {
-      case "host"     => DbHost
-      case "port"     => DbPort
-      case "driver"   => DbDriver
-      case "protocol" => DbProtocol
-      case "name"     => DbName
-      case other      => DbAttrOther(other)
+  /*final*/ case class DataSourceAttributeOther(name: String) extends DataSourceAttribute
+  sealed trait DataSourceAttribute
+  object DataSourceAttribute {
+    def apply(s: String): DataSourceAttribute = s.toLowerCase match {
+      case "host"     => DataSourceHost
+      case "port"     => DataSourcePort
+      case "driver"   => DataSourceDriver
+      case "protocol" => DataSourceProtocol
+      case "name"     => DataSourceName
+      case other      => DataSourceAttributeOther(other)
     }
   }
 
   // Represents all DB protocols supported
-  final case object MysqlProtocol extends DbProtocolType
-  final case object PostgresProtocol extends DbProtocolType
-  final case object SqliteProtocol extends DbProtocolType
-  sealed trait DbProtocolType {
+  final case object MysqlProtocol extends DataSourceProtocolType
+  final case object PostgresProtocol extends DataSourceProtocolType
+  final case object SqliteProtocol extends DataSourceProtocolType
+  sealed trait DataSourceProtocolType {
     override def toString: String =
       this.getClass
           .getSimpleName
@@ -49,14 +49,14 @@ trait ConfigurationTypes {
           .reverse
           .toLowerCase
   }
-  object DbProtocolType {
-    def apply(s: String): Option[DbProtocolType] =
+  object DataSourceProtocolType {
+    def apply(s: String): Option[DataSourceProtocolType] =
       s.toLowerCase match {
         case "mysql" => MysqlProtocol.some
         case "postgres" => PostgresProtocol.some
         case "postgresql" => PostgresProtocol.some
         case "sqlite" => SqliteProtocol.some
-        case _ => none[DbProtocolType]
+        case _ => none[DataSourceProtocolType]
       }
   }
 
@@ -78,15 +78,15 @@ trait ConfigurationTypes {
   final case object Staging extends Environment
   final case object Production extends Environment
 
-  type DbConfigMap = Map[DbConfigAttr, String]
-  object DbConfigMap {
-    def fromJson(j: String): Option[Map[DbConfigAttr, String]] =
+  type DataSourceConfigMap = Map[DataSourceAttribute, String]
+  object DataSourceConfigMap {
+    def fromJson(j: String): Option[Map[DataSourceAttribute, String]] =
       for {
         m <- j.decodeOption[Map[String, String]]
       } yield fromMap(m)
 
-    def fromMap(mm: Map[String, String]): Map[DbConfigAttr, String] =
-      mm.map { kv => DbConfigAttr(kv._1) -> kv._2 }
+    def fromMap(mm: Map[String, String]): Map[DataSourceAttribute, String] =
+      mm.map { kv => DataSourceAttribute(kv._1) -> kv._2 }
   }
 
   type ReaderTOption[A, B] = ReaderT[Option, A, B]
@@ -96,10 +96,10 @@ trait ConfigurationTypes {
       kleisli(f)
   }
 
-  type DbReaderTOption[A] = ReaderTOption[DbConfigMap, A]
-  object DbReaderTOption {
-    def apply[A](f: DbConfigMap => Option[A]): DbReaderTOption[A] =
-      ReaderTOption[DbConfigMap, A](f)
+  type DataSourceReaderTOption[A] = ReaderTOption[DataSourceConfigMap, A]
+  object DataSourceReaderTOption {
+    def apply[A](f: DataSourceConfigMap => Option[A]): DataSourceReaderTOption[A] =
+      ReaderTOption[DataSourceConfigMap, A](f)
   }
 }
 
@@ -107,7 +107,7 @@ trait ConfigurationInstances extends ConfigurationTypes {
   import argonaut._, Argonaut._
 
   // Is this needed now?
-  implicit def DbConfigMapDecodeJson =
+  implicit def DataSourceConfigMapDecodeJson =
     DecodeJson(c => for {
       host      <- (c --\ "host").as[String]
       port      <- (c --\ "port").as[String]
@@ -115,11 +115,11 @@ trait ConfigurationInstances extends ConfigurationTypes {
       protocol  <- (c --\ "protocol").as[String]
       name      <- (c --\ "name").as[String]
     } yield Map(
-      DbHost -> host,
-      DbPort -> port,
-      DbDriver -> driver,
-      DbProtocol -> protocol,
-      DbName -> name))
+      DataSourceHost -> host,
+      DataSourcePort -> port,
+      DataSourceDriver -> driver,
+      DataSourceProtocol -> protocol,
+      DataSourceName -> name))
 
   // Needed implicit later on in resolving codec for reading/loading
   // configuration sources.
@@ -145,18 +145,18 @@ trait ConfigurationFunctions extends ConfigurationTypes
     host:     String,
     port:     Integer,
     driver:   String,
-    protocol: DbProtocolType,
+    protocol: DataSourceProtocolType,
     name:     String) extends DataSource {
 
     def toUrl: String =
       protocol + "://" + host + ":" + port + "/" + name
   }
 
-  def lookupString(key: DbConfigAttr) =
-    DbReaderTOption[String] { _.get(key) }
+  def lookupString(key: DataSourceAttribute) =
+    DataSourceReaderTOption[String] { _.get(key) }
 
-  def lookupInteger(key: DbConfigAttr) =
-    DbReaderTOption[Integer] { map =>
+  def lookupInteger(key: DataSourceAttribute) =
+    DataSourceReaderTOption[Integer] { map =>
       // Gnarly stuff when interoping with Java, but at least
       // we make the interface of this function sensible.
       try {
@@ -166,32 +166,32 @@ trait ConfigurationFunctions extends ConfigurationTypes
       }
     }
 
-  def lookupDbProtocolType(key: DbConfigAttr) =
-    DbReaderTOption[DbProtocolType] { map =>
-      DbProtocolType(map.get(key) | "")
+  def lookupDataSourceProtocolType(key: DataSourceAttribute) =
+    DataSourceReaderTOption[DataSourceProtocolType] { map =>
+      DataSourceProtocolType(map.get(key) | "")
     }
 
-  def getDataSource: DbReaderTOption[DataSource] =
+  def getDataSource: DataSourceReaderTOption[DataSource] =
     // Note: Monadic style is not considered good form here
     // I am trying to avoid those "crazy" combinators that
     // everyone complains about in Scalaz just to work through
     // this example.
     for {
-      h <- lookupString(DbHost)
-      p <- lookupInteger(DbPort)
-      d <- lookupString(DbDriver)
-      q <- lookupDbProtocolType(DbProtocol)
-      n <- lookupString(DbName)
+      h <- lookupString(DataSourceHost)
+      p <- lookupInteger(DataSourcePort)
+      d <- lookupString(DataSourceDriver)
+      q <- lookupDataSourceProtocolType(DataSourceProtocol)
+      n <- lookupString(DataSourceName)
     } yield DataSourceImpl(h, p, d, q, n)
 
   /* Below are all functions related to reading/loading/parsing/resolving
-   * configuration sources/inputs to be able to provide the DbConfigMap
+   * configuration sources/inputs to be able to provide the DataSourceConfigMap
    * to getDataSource to get the desired DataSource value out (if the
    * configuration is good, otherwise we get a None.
    */
 
-  def parseConfig(bs: BufferedSource): DbConfigMap =
-    DbConfigMap.fromJson(bs.mkString) | DbConfigMap.fromMap(Map[String, String]())
+  def parseConfig(bs: BufferedSource): DataSourceConfigMap =
+    DataSourceConfigMap.fromJson(bs.mkString) | DataSourceConfigMap.fromMap(Map[String, String]())
 
   def fromSource(uri: JURL)(implicit codec: Codec): IO[BufferedSource] =
     IO { JSource.fromURL(uri)(codec) }
@@ -223,7 +223,7 @@ trait ConfigurationFunctions extends ConfigurationTypes
       case _          => fromSource(getFileUri(env))
     }
 
-  def loadConfig(env: Environment): IO[DbConfigMap] =
+  def loadConfig(env: Environment): IO[DataSourceConfigMap] =
     for {
       s <- sourceForEnvironment(env)
     } yield parseConfig(s)
@@ -236,17 +236,17 @@ trait ConfigurationFunctions extends ConfigurationTypes
 
 trait ConfigurationUsage extends ConfigurationFunctions {
   // Example test arguments for just the getDataSource definition above
-  val goodConfig: DbConfigMap = Map(
-    DbHost      -> "mydbhost",
-    DbPort      -> "3306",
-    DbProtocol  -> "mysql",
-    DbDriver    -> "my.awesome.MysqlDriver",
-    DbName      -> "contactsdb"
+  val goodConfig: DataSourceConfigMap = Map(
+    DataSourceHost      -> "mydbhost",
+    DataSourcePort      -> "3306",
+    DataSourceProtocol  -> "mysql",
+    DataSourceDriver    -> "my.awesome.MysqlDriver",
+    DataSourceName      -> "contactsdb"
   )
-  val badConfig: DbConfigMap = Map(
-    DbHost -> "mydbhost",
-    DbPort -> "3306",
-    DbName -> "contactsdb"
+  val badConfig: DataSourceConfigMap = Map(
+    DataSourceHost -> "mydbhost",
+    DataSourcePort -> "3306",
+    DataSourceName -> "contactsdb"
   )
 
   // In Scala console try:
