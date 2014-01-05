@@ -10,9 +10,12 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-concurrent" % scalazVersion,
   "org.scalaz" %% "scalaz-typelevel" % scalazVersion,
   "org.scalaz" %% "scalaz-xml" % scalazVersion,
+  "io.argonaut" %% "argonaut" % "6.0.1",
   "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
 )
 
 scalacOptions += "-feature"
+
+scalacOptions += "-unchecked"
 
 initialCommands in console := "import scalaz._, Scalaz._"
