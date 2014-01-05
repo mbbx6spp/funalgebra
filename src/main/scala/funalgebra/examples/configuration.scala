@@ -12,10 +12,10 @@ trait ConfigurationTypes {
   //
   // Think of this as creating a more type safe way
   // of extracting configuration. For some reason
-  // when used strings to lookup config attributes
-  // in a Map I did this: +config.get("prot") and
-  // spend 20 minutes wondering why it NPEs on looking
-  // up the PORT.
+  // when I used strings to lookup config attributes
+  // in a Map I did this: +config.get("prot")+ and
+  // spent 20 minutes wondering why it NPEs on looking
+  // up the port.
   final case object DbHost extends DbConfigAttr
   final case object DbPort extends DbConfigAttr
   final case object DbDriver extends DbConfigAttr
