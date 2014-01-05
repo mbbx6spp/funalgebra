@@ -204,7 +204,7 @@ TODO: Walk through bit by bit the Order typeclass porting from
 Haskell to Scala without dependencies for coins (the old fashioned
 physical coins used in US/UK/Euro countries not crypto-currencies).
 
-* [Here is the fleshed out source](https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/ordering.scala)
+* [Here is the fleshed out source](https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/examples/ordering.scala)
 
 ## Further Examples
 
@@ -213,8 +213,8 @@ demonstrating the utility of various ideas, structures, and types commonly
 used in functional programming:
 
 * Start out with describing your domain with closed algebraic data types: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/haskell/FunAlgebra/AlgTypes.hs
-* Explore extending types with one manfiestation of the typeclass pattern in Scala: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/ordering.scala
-* Stack monads together to defer evaluation/extraction of context until it is known: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/configuration.scala
+* Explore extending types with one manfiestation of the typeclass pattern in Scala: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/examples/ordering.scala
+* Stack monads together to defer evaluation/extraction of context until it is known: https://github.com/mbbx6spp/funalgebra/blob/master/src/main/scala/funalgebra/examples/configuration.scala
 * Abstracting over data and computation in the Erlang `either` module: https://github.com/mbbx6spp/chicagoerlang2013/blob/master/source/either.erl
 * Testing code using algebraic properties and thinking: https://github.com/mbbx6spp/chicagoerlang2013/blob/master/source/algebraic_properties.erl
 
