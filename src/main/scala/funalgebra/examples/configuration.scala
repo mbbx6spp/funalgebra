@@ -103,10 +103,23 @@ trait ConfigurationTypes {
   }
 }
 
-trait ConfigurationInstances {
+trait ConfigurationInstances extends ConfigurationTypes {
   import argonaut._, Argonaut._
 
-  //implicit def DbConfigMapCodecJson =
+  // Is this needed now?
+  implicit def DbConfigMapDecodeJson =
+    DecodeJson(c => for {
+      host      <- (c --\ "host").as[String]
+      port      <- (c --\ "port").as[String]
+      driver    <- (c --\ "driver").as[String]
+      protocol  <- (c --\ "protocol").as[String]
+      name      <- (c --\ "name").as[String]
+    } yield Map(
+      DbHost -> host,
+      DbPort -> port,
+      DbDriver -> driver,
+      DbProtocol -> protocol,
+      DbName -> name))
 
   // Needed implicit later on in resolving codec for reading/loading
   // configuration sources.
@@ -159,6 +172,10 @@ trait ConfigurationFunctions extends ConfigurationTypes
     }
 
   def getDataSource: DbReaderTOption[DataSource] =
+    // Note: Monadic style is not considered good form here
+    // I am trying to avoid those "crazy" combinators that
+    // everyone complains about in Scalaz just to work through
+    // this example.
     for {
       h <- lookupString(DbHost)
       p <- lookupInteger(DbPort)
@@ -173,12 +190,8 @@ trait ConfigurationFunctions extends ConfigurationTypes
    * configuration is good, otherwise we get a None.
    */
 
-
-  def readConfig(f: JSource): IO[String] =
-    sys.error("todo(1)")
-
-  def parseConfig(s: JSource): IO[DbConfigMap] =
-    sys.error("todo(2)")
+  def parseConfig(bs: BufferedSource): DbConfigMap =
+    DbConfigMap.fromJson(bs.mkString) | DbConfigMap.fromMap(Map[String, String]())
 
   def fromSource(uri: JURL)(implicit codec: Codec): IO[BufferedSource] =
     IO { JSource.fromURL(uri)(codec) }
@@ -188,9 +201,9 @@ trait ConfigurationFunctions extends ConfigurationTypes
       new BufferedSource(new ByteArrayInputStream("""
       {
         "host": "localhost",
-        "port": "3306",
-        "protocol": "postgres",
+        "port": "5432",
         "driver": "my.awesome.PostgresDriver",
+        "protocol": "postgres",
         "name": "contactsdb"
       }
       """.getBytes(codec.charSet)))
@@ -212,9 +225,13 @@ trait ConfigurationFunctions extends ConfigurationTypes
 
   def loadConfig(env: Environment): IO[DbConfigMap] =
     for {
-      s       <- sourceForEnvironment(env)
-      parsed  <- parseConfig(s)
-    } yield parsed
+      s <- sourceForEnvironment(env)
+    } yield parseConfig(s)
+
+  def configure(env: Environment): IO[Option[DataSource]] =
+    for {
+      cfg <- loadConfig(env)
+    } yield getDataSource(cfg)
 }
 
 trait ConfigurationUsage extends ConfigurationFunctions {
