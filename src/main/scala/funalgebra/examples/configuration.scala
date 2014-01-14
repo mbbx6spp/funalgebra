@@ -128,7 +128,7 @@ trait ConfigurationInstances extends ConfigurationTypes {
 
 trait ConfigurationFunctions extends ConfigurationTypes
                              with ConfigurationInstances {
-  import scala.io.{Codec, BufferedSource, Source => JSource}
+  import scala.io.{Codec, BufferedSource, Source => Source}
   import java.io.{File => JFile}
   import java.net.{URL => JURL}
   import java.io.ByteArrayInputStream
@@ -194,7 +194,7 @@ trait ConfigurationFunctions extends ConfigurationTypes
     DataSourceConfigMap.fromJson(bs.mkString) | DataSourceConfigMap.fromMap(Map[String, String]())
 
   def fromSource(uri: JURL)(implicit codec: Codec): IO[BufferedSource] =
-    IO { JSource.fromURL(uri)(codec) }
+    IO { Source.fromURL(uri)(codec) }
 
   def fromFixedStringSource: IO[BufferedSource] =
     IO {
