@@ -5,6 +5,8 @@ OUT_FILES := $(wildcard $(OUT_DIR)/*)
 TEX_DIR    = $(PWD)/tex
 TOR_DIR    = $(PWD)/torrent
 NAME       = dynamo-not-just-for-datastores
+#SLIDEDECK  = scalapdx
+SLIDEDECK  = slides
 
 default: clean setup compile
 
@@ -25,13 +27,13 @@ abstract: env
 	@xelatex -shell-escape -output-directory $(OUT_DIR) $(SRC_DIR)/abstract.tex
 
 slides: env
-	@xelatex -shell-escape -output-directory $(OUT_DIR) $(SRC_DIR)/slides.tex
+	@xelatex -shell-escape -output-directory $(OUT_DIR) $(SRC_DIR)/$(SLIDEDECK).tex
 
 view_abstract:
 	@open $(OUT_DIR)/abstract.pdf
 
 view_slides:
-	@open $(OUT_DIR)/slides.pdf
+	@open $(OUT_DIR)/$(SLIDEDECK).pdf
 
 torrentize: compile
 	@cp $(OUT_DIR)/abstract.pdf $(TOR_DIR)/$(NAME)-abstract.pdf
